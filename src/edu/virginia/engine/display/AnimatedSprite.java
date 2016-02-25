@@ -29,7 +29,7 @@ public class AnimatedSprite extends Sprite {
 	private String currentAnimation;
 	private boolean isPlaying;
 	private int animationSpeed;
-	private GameClock gameClock;
+	private GameClock gameClockAnimation;
 	
 	public AnimatedSprite(String id) {
 		super(id);
@@ -38,7 +38,7 @@ public class AnimatedSprite extends Sprite {
 		isPlaying = false;
 		currentAnimation = null;
 		animationSpeed = 1;
-		gameClock = new GameClock();
+		gameClockAnimation = new GameClock();
 		
 	}
 
@@ -49,7 +49,7 @@ public class AnimatedSprite extends Sprite {
 		isPlaying = false;
 		currentAnimation = null;
 		animationSpeed = 1;
-		gameClock = new GameClock();
+		gameClockAnimation = new GameClock();
 	}
 	
 	public AnimatedSprite(String id, String imageFileName, String spriteSheetFileName, String specsFileName) {
@@ -60,7 +60,7 @@ public class AnimatedSprite extends Sprite {
 		isPlaying = false;
 		currentAnimation = null;
 		animationSpeed = 1;
-		gameClock = new GameClock();
+		gameClockAnimation = new GameClock();
 	}
 	
 	public void animate(String animationName) {
@@ -71,7 +71,7 @@ public class AnimatedSprite extends Sprite {
 		}
 	}
 	
-	public void stop(){
+	public void stopAnimation(){
 		isPlaying = false;
 		currentFrame = 0;
 	}
@@ -110,7 +110,7 @@ public class AnimatedSprite extends Sprite {
 		super.update(pressedKeys);
 		if (this.isPlaying) {
 			//Update sprite to next frame if enough time has passed
-			if (this.gameClock.getElapsedTime() > (AVE_DRAW/(this.animationSpeed*.1))){
+			if (this.gameClockAnimation.getElapsedTime() > (AVE_DRAW/(this.animationSpeed*.1))){
 				if (spriteMap.containsKey(currentAnimation) 
 						&& spriteMap.get(currentAnimation).size() >= (this.currentFrame + 1)) {
 					
@@ -118,7 +118,7 @@ public class AnimatedSprite extends Sprite {
 					this.setImage(current);
 				}
 				this.increaseFrame();
-				this.gameClock.resetGameClock();
+				this.gameClockAnimation.resetGameClock();
 			}
 		} else {
 			if (spriteMap.containsKey(currentAnimation) 

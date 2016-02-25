@@ -3,6 +3,7 @@ package edu.virginia.engine.display;
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +11,10 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import edu.virginia.engine.events.CollisionEvent;
 import edu.virginia.engine.events.EventDispatcher;
 import edu.virginia.engine.util.Position;
+import edu.virginia.lab1test.PickedUpEvent;
 
 /**
  * A very basic display object for a java based gaming engine
@@ -33,11 +36,87 @@ public class DisplayObject extends EventDispatcher {
 	private double scaleY;	//1.0 is actual size
 	private double rotation; //in degrees
 	private float alpha; //1.0f is solid
-	
+	private Rectangle hitbox;
+	private boolean onGround;
 	/*
 	 * Getters and Setters
 	 */
 
+	public boolean isOnGround() {
+		return onGround;
+	}
+
+	public void setOnGround(boolean onGround) {
+		this.onGround = onGround;
+	}
+
+	public Rectangle getHitbox() {
+		return hitbox;
+	}
+	
+	private void setHitbox(Rectangle hitbox) {
+		this.hitbox = hitbox;
+	}
+	
+	private void moveHitbox() {
+		Rectangle newHitbox = new Rectangle();
+		newHitbox.setBounds((int)this.getxPos(), (int)this.getyPos(), 
+				(int) (this.getUnscaledWidth()*this.scaleX), 
+				(int) (this.getUnscaledHeight()*this.scaleY));
+		this.setHitbox(newHitbox);
+	}
+	
+	public boolean collidesWith(DisplayObject other) {
+		if (this.getHitbox().intersects(other.getHitbox())) {
+			this.dispatchEvent(new CollisionEvent(CollisionEvent.COLLISION, this));
+			return true;
+		}
+		return false;	
+	}
+	
+	public void obstacleCollision(DisplayObject sprite){
+		Rectangle obstacle = sprite.getHitbox();
+		boolean insideRightBound;
+		boolean insideLeftBound;
+		boolean belowUpperBound;
+		boolean aboveLowerBound;
+		if(this.hitbox.intersects(obstacle)){ //If true, should move away from rectangle
+			insideRightBound = (this.hitbox.getMinX() > obstacle.getMinX()); //true if inside Right bounc
+			insideLeftBound = (this.hitbox.getMaxX() < obstacle.getMaxX());
+			belowUpperBound = (this.hitbox.getMinY() > obstacle.getMinY());
+			aboveLowerBound = (this.hitbox.getMaxY() < obstacle.getMaxY());
+			
+			if(!belowUpperBound){
+				//Move Up
+				//this.setyPos((float) (this.yCurrent - (1.25)*this.yChange));
+				
+				this.setyPos(obstacle.getMinY() - this.getHitbox().getHeight());
+				this.moveHitbox();
+				this.setOnGround(true);
+			} else {
+				this.setOnGround(false);
+			}
+			if(!aboveLowerBound){
+				//Move down
+				this.setyPos(obstacle.getMaxY());
+				this.moveHitbox();
+			}
+			if(!insideRightBound){
+				//Move right
+				this.setxPos(obstacle.getMinX() - this.getHitbox().getWidth());
+				this.moveHitbox();
+			}
+			if(!insideLeftBound){
+				//Move left
+				this.setxPos(obstacle.getMaxX());
+				this.moveHitbox();
+			}
+			
+			
+		}
+			
+	}
+	
 	public boolean isVisible() {
 		return visible;
 	}
@@ -69,10 +148,12 @@ public class DisplayObject extends EventDispatcher {
 	public void setPosition(double x, double y) {
 		this.position.setX(x);
 		this.position.setY(y);
+		this.moveHitbox();
 	} 
 	
 	public void setPosition(Position position) {
 		this.position = position;
+		this.moveHitbox();
 	}
 
 	public Position getPivotPoint() {
@@ -200,6 +281,9 @@ public class DisplayObject extends EventDispatcher {
 		this.setRotationDegrees(0);
 		this.setScaleX(1.0);
 		this.setScaleY(1.0);
+		Rectangle hitbox = new Rectangle();
+		hitbox.setBounds(0, 0, this.getUnscaledWidth(), this.getUnscaledHeight());
+		this.setHitbox(hitbox);
 	}
 	
 	public DisplayObject(String id, String fileName, 
@@ -213,6 +297,9 @@ public class DisplayObject extends EventDispatcher {
 		this.setRotationDegrees(0);
 		this.setScaleX(1.0);
 		this.setScaleY(1.0);
+		Rectangle hitbox = new Rectangle();
+		hitbox.setBounds((int)xPos, (int)yPos, this.getUnscaledWidth(), this.getUnscaledHeight());
+		this.setHitbox(hitbox);
 	}
 
 	public void setId(String id) {
@@ -281,7 +368,7 @@ public class DisplayObject extends EventDispatcher {
 	 * to update objects appropriately.
 	 * */
 	protected void update(ArrayList<String> pressedKeys) {
-		
+		this.moveHitbox();
 	}
 
 	/**
