@@ -1,3 +1,7 @@
+From Lab 5:
+left and right to move, up to jump.
+Unusually glitchy O.o!!
+
 From Lab 4:
 To complete the quest, walk over to the key!
 

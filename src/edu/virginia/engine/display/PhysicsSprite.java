@@ -24,7 +24,7 @@ public class PhysicsSprite extends AnimatedSprite {
 		super(id, imageFileName, spriteSheetFileName, specsFileName);
 		mass = 1; 
 		gameClockPhysics = new GameClock();
-		gravity = 30.8;
+		gravity = 0;
 		terminalVel = Math.sqrt((2*mass*gravity)/(1.5));
 		forces = new ArrayList<Force>();
 		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY));

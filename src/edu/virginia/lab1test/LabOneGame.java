@@ -23,6 +23,10 @@ import edu.virginia.engine.display.PhysicsSprite;
 import edu.virginia.engine.display.SoundManager;
 import edu.virginia.engine.display.Sprite;
 import edu.virginia.engine.events.CollisionEvent;
+import edu.virginia.engine.tween.Tween;
+import edu.virginia.engine.tween.TweenJuggler;
+import edu.virginia.engine.tween.TweenTransitions;
+import edu.virginia.engine.tween.TweenableParam;
 
 /**
  * Modified by: Leandra Irvine (lli5ba)
@@ -42,6 +46,7 @@ public class LabOneGame extends Game {
 	Sprite floor = new Sprite("Floor", "floor.png");
 	Sprite platform = new Sprite("Platform", "floor.png");
 	SoundManager mySoundManager;
+	TweenJuggler myTweenJuggler = new TweenJuggler();
 	/**
 	 * Constructor. See constructor in Game.java for details on the parameters given
 	 * @throws UnsupportedAudioFileException 
@@ -53,7 +58,7 @@ public class LabOneGame extends Game {
 		mySoundManager.LoadMusic("thebestsong", "whatisthis.wav");
 		mySoundManager.PlayMusic("thebestsong");
 		//lily.setPosition(100, 100);
-		lily2.setPosition(20, 100);
+		lily2.setPosition(250, 100);
 		//lily.animate("down");
 		key.setPosition(350, 50);
 		floor.setPosition(0, 300 - floor.getUnscaledHeight() - 10);
@@ -61,6 +66,13 @@ public class LabOneGame extends Game {
 		platform.setPosition(200, 150);
 		key.addEventListener(myQuestManager, PickedUpEvent.KEY_PICKED_UP);
 		key.addEventListener(myQuestManager, CollisionEvent.COLLISION);
+		Tween tween0 = new Tween(lily2, TweenTransitions.LINEAR);
+		myTweenJuggler.add(tween0);
+		tween0.animate(TweenableParam.SCALE_X, -1, 2, 1000);
+		//tween0.animate(TweenableParam.SCALE_Y, 0, 1, 20000);
+		//tween0.animate(TweenableParam.ALPHA, 1, 0, 20000);
+		lily2.setScaleX(1.2);
+		
 	}
 	
 	
@@ -188,6 +200,10 @@ public class LabOneGame extends Game {
 		}
 		if (this.platform != null) {
 			platform.update(pressedKeys);
+		}
+		
+		if (myTweenJuggler != null) {
+			myTweenJuggler.nextFrame();
 		}
 		/*if (this.lily != null) {
 			moveSpritePlatformerAnimate(lily, pressedKeys);
