@@ -31,32 +31,35 @@ public class Tween extends EventDispatcher{
 		complete = false;
 	}
 	
+	public DisplayObject getObject(){
+		return this.object;
+	}
+	
 	public void animate(TweenableParam fieldToAnimate, double startVal, double endVal, double time) {
 		this.tweenOps.add(new TweenParam(fieldToAnimate, startVal, endVal, time));
-		complete = false;
+		if(this.gameClock == null) {
+			gameClock = new GameClock();
+		}
+		this.gameClock.resetGameClock();
+		this.complete = false;
 	}
 	public void update() { //invoked once per frame by the TweenJuggler. Updates this tween / DisplayObject
 		if(this.gameClock == null) {
 			gameClock = new GameClock();
-			System.out.println("making gameclock");
 		}
 		
 		if(!this.tweenOps.isEmpty() && this.gameClock.getElapsedTime() >= Collections.max(this.tweenOps).getTweenTime()){
-			System.out.println("completed tween");
 			completedTween();
 		}
 		
 		for (TweenParam tweenOp : tweenOps) {
 			if (tweenOp.getTweenTime() > this.gameClock.getElapsedTime()) {
-				double percentDone = (tweenOp.getTweenTime() - this.gameClock.getElapsedTime()) / tweenOp.getTweenTime();
+				double percentDone = 1 - ((tweenOp.getTweenTime() - this.gameClock.getElapsedTime()) / tweenOp.getTweenTime());
 				double newValue = (tweenOp.getEndVal() - tweenOp.getStartVal())
 						*TweenTransition.applyTransition(this.transition, percentDone)
 						+ tweenOp.getStartVal();
-				System.out.println("newvalue: " + newValue);
 				this.setValue(tweenOp.getParamToTween(), 
 						newValue);
-				System.out.println("( " + this.object.getxPos() + ", " + this.object.getyPos() + ")");
-				System.out.println("( " + this.object.getScaleX() + ", " + this.object.getScaleY() + ")");
 			}
 		}
 	}
@@ -66,7 +69,7 @@ public class Tween extends EventDispatcher{
 		return "Tween [transition=" + transition + ", tweenOps=" + tweenOps + ", complete=" + complete + "]";
 	}
 	private void completedTween() {
-		this.dispatchEvent(new TweenEvent(TweenEvent.TWEEN_COMPLETE_EVENT, this));
+		this.object.dispatchEvent(new TweenEvent(TweenEvent.TWEEN_COMPLETE_EVENT, this.object));
 		this.complete = true;
 	}
 	

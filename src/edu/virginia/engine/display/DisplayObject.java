@@ -273,10 +273,10 @@ public class DisplayObject extends EventDispatcher {
 
 	public DisplayObject(String id, String fileName) {
 		this.setId(id);
+		this.setPivotPoint(new Position(0, 0));
 		this.setImage(fileName);
 		this.setVisible(true);
 		this.setAlpha(1.0f);
-		this.setPivotPoint(new Position(0, 0));
 		this.setPosition(new Position(0, 0));
 		this.setRotationDegrees(0);
 		this.setScaleX(1.0);
@@ -284,15 +284,16 @@ public class DisplayObject extends EventDispatcher {
 		Rectangle hitbox = new Rectangle();
 		hitbox.setBounds(0, 0, this.getUnscaledWidth(), this.getUnscaledHeight());
 		this.setHitbox(hitbox);
+		this.setOnGround(false);
 	}
 	
 	public DisplayObject(String id, String fileName, 
 			double xPos, double yPos) {
 		this.setId(id);
+		this.setPivotPoint(new Position(0, 0));
 		this.setImage(fileName);
 		this.setVisible(true);
 		this.setAlpha(1.0f);
-		this.setPivotPoint(new Position(0, 0));
 		this.setPosition(new Position(xPos, yPos));
 		this.setRotationDegrees(0);
 		this.setScaleX(1.0);
@@ -300,6 +301,7 @@ public class DisplayObject extends EventDispatcher {
 		Rectangle hitbox = new Rectangle();
 		hitbox.setBounds((int)xPos, (int)yPos, this.getUnscaledWidth(), this.getUnscaledHeight());
 		this.setHitbox(hitbox);
+		this.setOnGround(false);
 	}
 
 	public void setId(String id) {
@@ -337,6 +339,7 @@ public class DisplayObject extends EventDispatcher {
 		if (displayImage == null) {
 			System.err.println("[DisplayObject.setImage] ERROR: " + imageName + " does not exist!");
 		}
+		this.setPivotPoint(new Position(this.getUnscaledWidth()/2,this.getUnscaledHeight()/2));
 	}
 
 
@@ -406,10 +409,9 @@ public class DisplayObject extends EventDispatcher {
 	 * */
 	protected void applyTransformations(Graphics2D g2d) {
 		g2d.setComposite(makeComposite(this.alpha));
-		g2d.translate(this.getUnscaledWidth()/2, this.getUnscaledHeight()/2);
-		g2d.scale(this.getScaleX(), this.getScaleY());
 		g2d.rotate(this.getRotation(), this.pivotPoint.getX(), this.pivotPoint.getY());
 		g2d.translate(this.getxPos(), this.getyPos());
+		g2d.scale(this.getScaleX(), this.getScaleY());
 		
 	}
 
@@ -418,10 +420,10 @@ public class DisplayObject extends EventDispatcher {
 	 * object
 	 * */
 	protected void reverseTransformations(Graphics2D g2d) {
-		g2d.translate(-this.getxPos(), -this.getyPos());
-		g2d.rotate(-this.getRotation(), -this.pivotPoint.getX(), -this.pivotPoint.getY());
 		g2d.scale((1/this.getScaleX()), (1/this.getScaleY()));
-		g2d.translate(-this.getUnscaledWidth()/2, -this.getUnscaledHeight()/2);
+		g2d.translate(-this.getxPos(), -this.getyPos());
+		g2d.rotate(-this.getRotation(), this.pivotPoint.getX(), this.pivotPoint.getY());
+		
 		g2d.setComposite(makeComposite(1.0f));
 		
 		

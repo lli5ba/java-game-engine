@@ -54,7 +54,7 @@ public class TweenParam implements Comparable<TweenParam>{
 	@Override
 	public String toString() {
 		return "TweenParam [" + "startVal=" + startVal + ", endVal=" + endVal
-				+ ", tweenTime=" + tweenTime + "]";
+				+ ", tweenTime=" + tweenTime +", paramToTween=" + this.paramToTween + "]";
 	}
 
 

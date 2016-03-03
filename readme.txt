@@ -1,3 +1,7 @@
+From Lab 6:
+left and right to move, up to jump.
+I haven't perfected my collision prediction yet, but this lab is about the Tweening--I plan to improve collisions over break!
+
 From Lab 5:
 left and right to move, up to jump.
 Unusually glitchy O.o!!

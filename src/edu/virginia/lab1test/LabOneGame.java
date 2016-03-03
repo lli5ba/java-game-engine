@@ -20,13 +20,16 @@ import javax.swing.plaf.synth.SynthSeparatorUI;
 import edu.virginia.engine.display.AnimatedSprite;
 import edu.virginia.engine.display.Game;
 import edu.virginia.engine.display.PhysicsSprite;
+import edu.virginia.engine.display.PickedUpItem;
 import edu.virginia.engine.display.SoundManager;
 import edu.virginia.engine.display.Sprite;
 import edu.virginia.engine.events.CollisionEvent;
 import edu.virginia.engine.tween.Tween;
+import edu.virginia.engine.tween.TweenEvent;
 import edu.virginia.engine.tween.TweenJuggler;
 import edu.virginia.engine.tween.TweenTransitions;
 import edu.virginia.engine.tween.TweenableParam;
+import edu.virginia.engine.util.Position;
 
 /**
  * Modified by: Leandra Irvine (lli5ba)
@@ -39,14 +42,14 @@ public class LabOneGame extends Game {
 	public static int gameWidth = 500;
 	/* Create a sprite object for our game. We'll use mario */
 	//Sprite mario = new Sprite("Mario", "Mario.png");
-	Sprite key = new Sprite("Key", "Small_Key.png");
+	PickedUpItem key = new PickedUpItem("Key", "Small_Key.png");
 	//AnimatedSprite lily = new AnimatedSprite("Lily", "Lily.png", "LilySheet.png", "LilySpecs.txt");
 	PhysicsSprite lily2 = new PhysicsSprite("Lily2", "Lily.png", "LilySheet.png", "LilySpecs.txt");
 	QuestManager myQuestManager = new QuestManager();
 	Sprite floor = new Sprite("Floor", "floor.png");
 	Sprite platform = new Sprite("Platform", "floor.png");
 	SoundManager mySoundManager;
-	TweenJuggler myTweenJuggler = new TweenJuggler();
+	TweenJuggler myTweenJuggler = TweenJuggler.getInstance();
 	/**
 	 * Constructor. See constructor in Game.java for details on the parameters given
 	 * @throws UnsupportedAudioFileException 
@@ -58,20 +61,23 @@ public class LabOneGame extends Game {
 		mySoundManager.LoadMusic("thebestsong", "whatisthis.wav");
 		mySoundManager.PlayMusic("thebestsong");
 		//lily.setPosition(100, 100);
-		lily2.setPosition(250, 100);
+		lily2.setPosition(0, 0);
 		//lily.animate("down");
-		key.setPosition(350, 50);
+		key.setPosition(275, 50);
 		floor.setPosition(0, 300 - floor.getUnscaledHeight() - 10);
 		floor.setScaleX(20);
 		platform.setPosition(200, 150);
 		key.addEventListener(myQuestManager, PickedUpEvent.KEY_PICKED_UP);
 		key.addEventListener(myQuestManager, CollisionEvent.COLLISION);
-		Tween tween0 = new Tween(lily2, TweenTransitions.LINEAR);
+		key.addEventListener(myQuestManager, TweenEvent.TWEEN_COMPLETE_EVENT);
+		lily2.setPivotPoint(new Position(lily2.getUnscaledWidth()/2,lily2.getUnscaledHeight()/2));
+		Tween tween0 = new Tween(lily2, TweenTransitions.EASE_IN_OUT);
 		myTweenJuggler.add(tween0);
-		tween0.animate(TweenableParam.SCALE_X, -1, 2, 1000);
-		//tween0.animate(TweenableParam.SCALE_Y, 0, 1, 20000);
-		//tween0.animate(TweenableParam.ALPHA, 1, 0, 20000);
-		lily2.setScaleX(1.2);
+		tween0.animate(TweenableParam.SCALE_X, 0, 1, 1000);
+		tween0.animate(TweenableParam.SCALE_Y, 0, 1, 1000);
+		tween0.animate(TweenableParam.ALPHA, 0, 1, 1000);
+		tween0.animate(TweenableParam.POS_X, 0, 100, 1000);
+		tween0.animate(TweenableParam.POS_Y, 0, 100, 1000);
 		
 	}
 	
@@ -92,7 +98,7 @@ public class LabOneGame extends Game {
 			sprite.update(pressedKeys);
 			if(pressedKeys.contains(KeyEvent.getKeyText(KeyEvent.VK_UP))) {
 				if (sprite.isOnGround()) {
-					sprite.addForce(0, -225, 5);
+					sprite.addForce(0, -225, 5, "jump");
 					sprite.setOnGround(false);
 				}
 				/*if(sprite.getyPos() > 0) {
@@ -189,10 +195,9 @@ public class LabOneGame extends Game {
 				lily2.obstacleCollision(platform);
 				
 			}
-			if (lily2.collidesWith(key) && key.isVisible()) {
-				
+			if (lily2.collidesWith(key) && !key.isPickedUp()) {
 				key.dispatchEvent(new PickedUpEvent(PickedUpEvent.KEY_PICKED_UP, key));
-				key.setVisible(false);
+				key.setPickedUp(true);
 			}
 		}
 		if (this.floor != null) {
@@ -239,14 +244,15 @@ public class LabOneGame extends Game {
 		if(lily2 != null) {
 			lily2.draw(g);
 		}
-		if(key != null) {
-			key.draw(g);
-		}
+		
 		if(floor != null) {
 			floor.draw(g);
 		}
 		if(platform != null) {
 			platform.draw(g);
+		}
+		if(key != null) {
+			key.draw(g);
 		}
 	}
 

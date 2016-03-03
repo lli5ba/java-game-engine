@@ -24,10 +24,10 @@ public class PhysicsSprite extends AnimatedSprite {
 		super(id, imageFileName, spriteSheetFileName, specsFileName);
 		mass = 1; 
 		gameClockPhysics = new GameClock();
-		gravity = 0;
+		gravity = 30;
 		terminalVel = Math.sqrt((2*mass*gravity)/(1.5));
 		forces = new ArrayList<Force>();
-		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY));
+		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY, "gravity"));
 		deltaTime = 10.5; //ms
 		
 	}
@@ -39,7 +39,7 @@ public class PhysicsSprite extends AnimatedSprite {
 		gravity = 9.8;
 		terminalVel = Math.sqrt((2*mass*gravity)/(1.5));
 		forces = new ArrayList<Force>();
-		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY));
+		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY, "gravity"));
 		deltaTime = 10.5; //ms
 	}
 
@@ -50,7 +50,7 @@ public class PhysicsSprite extends AnimatedSprite {
 		gravity = 9.8;
 		terminalVel = Math.sqrt((2*mass*gravity)/1.5);
 		forces = new ArrayList<Force>();
-		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY));
+		forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY, "gravity"));
 		deltaTime = 10.5; //ms
 	}
 
@@ -76,12 +76,43 @@ public class PhysicsSprite extends AnimatedSprite {
 		}
 	}
 	
+	public boolean forcesContains(String name) {
+		for (Force force : forces){
+			if (force.getName().equals(name)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void removeForceByName(String name) {
+		Force toRemove = null;
+		for (Force force : forces){
+			if (force.getName().equals(name)){
+				toRemove = force;
+			}
+		}
+		if (toRemove != null) {
+			this.forces.remove(toRemove);
+		}
+	}
+	
 	public void moveSprite(double time){
 		time = time/100; //convert  
 		double totalxForce = 0;
 		double totalyForce = 0;
 		double initxVel = this.xVel;
 		double inityVel = this.yVel;
+//		if (this.isOnGround() && forcesContains("gravity")) {
+//			removeForceByName("gravity");
+//			this.yVel = 0;
+//			inityVel = 0;
+//		} else {
+//			if(!this.isOnGround() && !forcesContains("gravity")) {
+//				forces.add(new Force(0, gravity, Float.POSITIVE_INFINITY, "gravity"));
+//				this.yVel = 40;
+//			}
+//		}
 		for (Force force : forces) {
 			totalxForce += force.getxForce();
 			totalyForce += force.getyForce();
@@ -96,7 +127,6 @@ public class PhysicsSprite extends AnimatedSprite {
 			this.yVel = inityVel + (totalyForce/mass)*time;
 		}
 		this.setyPos(this.getyPos() + inityVel*time + (totalyForce/(2*mass))*Math.pow(time,2));
-		
 	}
 	
 	public void createSingleForce(double xForce, double yForce) {
@@ -109,7 +139,11 @@ public class PhysicsSprite extends AnimatedSprite {
 		this.yAcc = yNewForce/mass;
 	}
 	
-	public void addForce(double xForce, double yForce, double timeRemaining) {
-		forces.add(new Force(xForce, yForce, timeRemaining));
+	public void setGravity(double gravity) {
+		this.gravity = gravity;
+	}
+	
+	public void addForce(double xForce, double yForce, double timeRemaining, String name) {
+		forces.add(new Force(xForce, yForce, timeRemaining, name));
 	}
 }
